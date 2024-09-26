@@ -2,16 +2,15 @@ import React, { createRef } from 'react'
 import { SafeAreaView, StatusBar, View, StyleSheet, Image, Text, TouchableOpacity } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
 
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer'
 
-import { routes, screens } from './src/RouteItems'
+import Icon from './src/components/icon'
+
+import { Drawer, Tab } from './src/utils/factoryNavigator'
+
 import HomeStack from './src/stacks/home'
 import BookStack from './src/stacks/book'
 import ContactStack from './src/stacks/contact'
-import MyRewardsStack from './src/stacks/my-rewards'
-import LocationsStack from './src/stacks/location'
-import Icon from './src/components/icon'
 
 import type { Ref } from 'react'
 import type { NavigationContainerRef } from '@react-navigation/native'
@@ -19,12 +18,48 @@ import type { NavigationContainerRef } from '@react-navigation/native'
 // FIXME: Could be the list of screen
 type RootParamList = {}
 
+const iconDrawer: string = 'bars'
+const iconRight: string = 'bell'
 const iconSize: number = 20
-const Drawer = createDrawerNavigator()
-const Tab = createBottomTabNavigator()
 
+const routes = [
+  {
+    "component": "HomeScreen",
+    "icon": {
+      "name": "home-sharp",
+      "type": "Ionicons"
+    },
+    "name": "HomeScreen",
+    "showInDrawer": true,
+    "showInTab": true,
+    "title": "Home"
+  },
+  {
+    "component": "BookScreen",
+    "icon": {
+      "name": "book",
+      "type": "Entypo"
+    },
+    "name": "BookScreen",
+    "showInDrawer": true,
+    "title": "Marker"
+  },
+  {
+    "component": "ContactScreen",
+    "icon": {
+      "type": "FontAwesome5",
+      "name": "phone-alt"
+    },
+    "name": "ContactScreen",
+    "showInTab": true,
+    "title": "Call Us"
+  }
+]
 const tabOptions = ({ route }: any) => {
+  // const routes = useRecoilValue(routes);
   const item: any = routes.find((routeItem) => routeItem.name === route.name);
+
+  // const item: any = { showInTab: true, title: '', icon: { name: 'glass' } };
   const defaults = {
     headerShown: false,
     tabBarStyle: styles.tabContainer,
@@ -46,83 +81,76 @@ const tabOptions = ({ route }: any) => {
     ),
   }
 }
-const BottomTabNavigator = () => (
-  <Tab.Navigator screenOptions={tabOptions}>
-    <Tab.Screen name={screens.HomeStack} component={HomeStack} />
-    <Tab.Screen name={screens.BookStack} component={BookStack} />
-    <Tab.Screen name={screens.ContactStack} component={ContactStack} />
-    <Tab.Screen name={screens.MyRewardsStack} component={MyRewardsStack} />
-    <Tab.Screen name={screens.LocationsStack} component={LocationsStack} />
-  </Tab.Navigator>
-)
 
 const CustomDrawerContent = (props: any) => {
-  // FIXME: Not working
-  const currentRouteName = props.nav()?.getCurrentRoute()?.name;
+  const routes = props.routes;
 
   return (
     <DrawerContentScrollView {...props}>
-      {
-        routes.filter(route => route.showInDrawer).map(({ name, title, icon, ...rest }) => {
-          console.log('CustomDrawerContent', { name });
+      {routes.map(({ showInDrawer, name, title, icon, component }: any) => showInDrawer ? (<DrawerItem key={name}
+        label={() => (<View style={styles.row}>
+          {icon?.name && (<Icon {...icon} size={iconSize} color="#66cc" />)}
+          <Text style={styles.drawerLabel}>
+            {title ?? component.name}
+          </Text>
+        </View>)}
+        onPress={() => {
+          console.log({ name });
 
-          const focusedRoute = routes.find(r => r.name === currentRouteName)
-          const focused = focusedRoute ?
-            name === focusedRoute?.focusedRoute :
-            name === screens.HomeStack;
-          return (
-            <DrawerItem
-              key={name}
-              label={() => (<View style={styles.row}>
-                <Icon {...icon} size={iconSize} color={focused ? '#551E18' : '#000'} />
-                <Text style={focused ? styles.drawerLabelFocused : styles.drawerLabel}>
-                  {title}
-                </Text>
-              </View>)}
-              onPress={() => props.navigation.navigate(name)}
-              style={[styles.drawerItem, focused ? styles.drawerItemFocused : null]}
-            />
-          )
-        })
-      }
+          props.navigation.navigate(name)
+        }}
+        style={[styles.drawerItem, styles.drawerItemFocused]}
+      />) : null)}
     </DrawerContentScrollView>
   )
 }
-const DrawerNavigator = ({ nav }) => (
-  <Drawer.Navigator
-    screenOptions={({ navigation }) => ({
-      headerStyle: {
-        backgroundColor: '#551E18',
-        height: 50,
-      },
-      headerLeft: () => (
-        <TouchableOpacity onPress={() => navigation.toggleDrawer()} style={styles.headerLeft}>
-          <Icon name="bars" size={iconSize} color="#c66" />
-        </TouchableOpacity>
-      ),
-    })}
-    drawerContent={(props) => <CustomDrawerContent {...props} nav={nav} />}
-  >
-    <Drawer.Screen name={screens.HomeTab} component={BottomTabNavigator} options={{
-      title: 'Home',
-      headerTitle: () => (<Text>Title</Text>),
-      headerRight: () => (
-        <View style={styles.headerRight}>
-          <Icon name="bell" size={iconSize} color="#f66" />
-        </View>
-      ),
-    }} />
-  </Drawer.Navigator>
-)
+const DrawerNavigator = ({ nav, routes }: { nav: any; routes: any }) => {
+  const TabNavigator = () => (<Tab.Navigator screenOptions={tabOptions}>{routes.map(({ component, name }: any) => (<Tab.Screen key={name} name={name} component={component} />))}</Tab.Navigator>);
+
+  return (
+    <Drawer.Navigator
+      screenOptions={({ navigation }) => ({
+        headerStyle: {
+          backgroundColor: '#551E18',
+          height: 50,
+        },
+        headerLeft: () => (
+          <TouchableOpacity onPress={() => navigation.toggleDrawer()} style={styles.headerLeft}>
+            <Icon name={iconDrawer} size={iconSize} color="#c66" />
+          </TouchableOpacity>
+        ),
+      })}
+      drawerContent={(props) => <CustomDrawerContent {...props} routes={routes} nav={nav} />}
+    >
+      <Drawer.Screen name="HomeTab" component={TabNavigator} options={{
+        headerTitle: () => (<Text>Title</Text>),
+        headerRight: () => (
+          <View style={styles.headerRight}>
+            <Icon name={iconRight} size={iconSize} color="#f66" />
+          </View>
+        ),
+      }} />
+    </Drawer.Navigator>
+  )
+}
+
 const App = () => {
+  const stacks = [HomeStack, BookStack, ContactStack].reduce((prev: any, curr: any) => prev.concat(curr))
+    .map((screen) => ({
+      ...screen,
+      name: screen.component.name,
+    }));
+  // TODO: Save routes in global state
+  console.log(stacks);
+
   const navigationRef: Ref<NavigationContainerRef<RootParamList>> | undefined = createRef()
-  const nav = () => navigationRef.current
+  const nav: () => NavigationContainerRef<RootParamList> | null = () => navigationRef.current
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
       <NavigationContainer ref={navigationRef}>
-        <DrawerNavigator nav={nav} />
+        <DrawerNavigator nav={nav} routes={stacks} />
       </NavigationContainer>
     </SafeAreaView>
   )

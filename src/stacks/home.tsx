@@ -1,16 +1,14 @@
-import React from 'react'
-import { createStackNavigator } from '@react-navigation/stack'
+import HomeScreen from '../screens/home'
 
-import HomeScreen from '../screens/book'
-
-const Stack = createStackNavigator()
-
-const HomeStack = () => (
-  <Stack.Navigator screenOptions={{
-    headerShown: false,
-  }}>
-    <Stack.Screen name={HomeScreen.name} component={HomeScreen} />
-  </Stack.Navigator>
-)
-
-export default HomeStack
+export default [
+  {
+    component: HomeScreen,
+    title: 'Home',
+    showInDrawer: true,
+    showInTab: true,
+    icon: {
+      type: 'Ionicons',
+      name: 'home-sharp'
+    },
+  }
+]

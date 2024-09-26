@@ -9,12 +9,6 @@ export const screens = {
 
   Contact: 'Contact',
   ContactStack: 'ContactStack',
-
-  MyRewards: 'MyRewards',
-  MyRewardsStack: 'MyRewardsStack',
-
-  Locations: 'Locations',
-  LocationsStack: 'LocationsStack',
 }
 
 export const routes = [
@@ -51,13 +45,12 @@ export const routes = [
       name: 'home'
     },
   },
-
   {
     name: screens.BookStack,
     focusedRoute: screens.BookStack,
-    title: 'BookScreen Room',
+    title: 'Book',
     showInTab: true,
-    showInDrawer: false,
+    showInDrawer: true,
     icon: {
       type: 'FontAwesome',
       name: 'home'
@@ -94,50 +87,6 @@ export const routes = [
     icon: {
       type: 'FontAwesome',
       name: 'home'
-    },
-  },
-  {
-    name: screens.MyRewardsStack,
-    focusedRoute: screens.MyRewardsStack,
-    title: 'My Rewards',
-    showInTab: false,
-    showInDrawer: true,
-    icon: {
-      type: 'FontAwesome',
-      name: 'home'
-    },
-  },
-  {
-    name: screens.MyRewards,
-    focusedRoute: screens.MyRewardsStack,
-    title: 'My Rewards',
-    showInTab: false,
-    showInDrawer: false,
-    icon: {
-      type: 'FontAwesome',
-      name: 'home'
-    },
-  },
-  {
-    name: screens.LocationsStack,
-    focusedRoute: screens.LocationsStack,
-    title: 'Locations',
-    showInTab: false,
-    showInDrawer: true,
-    icon: {
-      type: 'FontAwesome',
-      name: 'bed'
-    },
-  },
-  {
-    name: screens.Locations,
-    focusedRoute: screens.LocationsStack,
-    title: 'Locations',
-    showInTab: false,
-    showInDrawer: false,
-    icon: {
-      type: 'FontAwesome',
-      name: 'bed'
     },
   },
 ]
